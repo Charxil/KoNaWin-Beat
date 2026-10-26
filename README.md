@@ -18,3 +18,4 @@ Upload the new `index.html`. Then open `sw.js` and change `ko-nawin-v1` to `ko-n
 ## Notes
 - Several people can share one phone: each has their own profile (tap a name at the top to switch). Progress is saved on that phone only.
 - The app works offline after it has been opened once.
+- Use **Backup → Save backup to phone** now and then. It saves a `ko-nawin-backup-….json` file to Downloads (or send it to Google Drive). **Restore from backup** brings everything back on a new phone or after Chrome data is cleared.

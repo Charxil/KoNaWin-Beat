@@ -268,6 +268,19 @@ select{font:inherit;padding:4px 8px;border-radius:8px;border:1px solid var(--lin
       <span id="startOverNote">Begins again at Level 1, Day 1 on a Monday.</span>
     </div>
     <div class="detail" id="startOverAsk" hidden></div>
+  </section>
+
+  <section class="main">
+    <h2>Backup · မှတ်တမ်းသိမ်း</h2>
+    <p class="note" style="margin:0 0 10px">Save everyone's progress, start dates and pagodas as a file on your phone. Keep it in Downloads, Google Drive or a chat. If the app is removed, the phone is changed, or Chrome data is cleared, restore it from that file.</p>
+    <div class="actions" style="justify-content:flex-start">
+      <button class="btn primary" id="bkSave">Save backup to phone</button>
+      <button class="btn" id="bkShare" hidden>Send backup (Drive, chat…)</button>
+      <button class="btn" id="bkRestore">Restore from backup</button>
+      <input type="file" id="bkFile" accept=".json,application/json" hidden>
+    </div>
+    <p class="note" id="bkMsg" style="margin:8px 0 0"></p>
+    <div class="detail" id="bkAsk" hidden></div>
     <p class="note">Each day follows the chart: say the day's Buddha attribute for the listed number of rounds. When every round is done, the day turns green. The next day opens automatically at 00:00, but only if today is completed. If a day is missed, the practice starts again from Level 1, Day 1 on the next Monday (today, if today is Monday). The calendar shows completed days, today, the planned days ahead and any missed day. Each person has their own progress. Tap a name at the top to switch, or tap the selected name to rename or remove it. Progress is saved on this phone.</p>
   </section>
 
@@ -787,6 +800,67 @@ setInterval(()=>{rollover();render();},30000);
 // keep the screen awake while counting, if allowed
 async function wake(){try{if('wakeLock' in navigator) await navigator.wakeLock.request('screen');}catch(e){}}
 document.addEventListener('click',wake,{once:true});
+
+// ---- Backup to the phone's own storage ----
+function backupData(){
+  const states={}; P.list.forEach(x=>{states[x.id]=x.id===P.active?S:loadState(x.id);});
+  return {app:'ko-nawin-mala',version:1,saved:new Date().toISOString(),people:{active:P.active,list:P.list},states};
+}
+function backupName(){return 'ko-nawin-backup-'+todayKey()+'.json';}
+function noteBackup(){ P.lastBackup=todayKey(); saveP(); showBkMsg(); }
+function showBkMsg(t){
+  $('bkMsg').textContent=t||(P.lastBackup?'Last backup: '+fmt(P.lastBackup,{weekday:'short',day:'numeric',month:'short',year:'numeric'}):'No backup saved yet.');
+}
+$('bkSave').addEventListener('click',()=>{
+  try{
+    const blob=new Blob([JSON.stringify(backupData(),null,1)],{type:'application/json'});
+    const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=backupName();
+    document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),4000);
+    noteBackup(); showBkMsg('Saved '+backupName()+' to your Downloads folder.');
+  }catch(e){ showBkMsg('Could not save the file. Try “Send backup” instead.'); }
+});
+try{
+  const test=new File(['x'],'t.json',{type:'application/json'});
+  if(navigator.canShare&&navigator.canShare({files:[test]})) $('bkShare').hidden=false;
+}catch(e){}
+$('bkShare').addEventListener('click',async()=>{
+  try{
+    const f=new File([JSON.stringify(backupData(),null,1)],backupName(),{type:'application/json'});
+    await navigator.share({files:[f],title:'Ko Nawin backup'}); noteBackup();
+  }catch(e){ if(e&&e.name!=='AbortError') showBkMsg('Sharing is not available here. Use “Save backup to phone”.'); }
+});
+$('bkRestore').addEventListener('click',()=>$('bkFile').click());
+$('bkFile').addEventListener('change',()=>{
+  const f=$('bkFile').files[0]; if(!f) return;
+  const r=new FileReader();
+  r.onload=()=>{
+    let data; try{data=JSON.parse(r.result);}catch(e){data=null;}
+    $('bkFile').value='';
+    if(!data||data.app!=='ko-nawin-mala'||!data.people||!Array.isArray(data.people.list)||!data.states){
+      showBkMsg('That file is not a Ko Nawin backup. Choose a file named ko-nawin-backup-….json.'); return;
+    }
+    const names=data.people.list.map(x=>esc(x.name)).join(', ');
+    const box=$('bkAsk');
+    box.innerHTML=`<p><strong>Restore this backup?</strong></p>
+      <p class="warn">Saved ${fmt(String(data.saved).slice(0,10),{day:'numeric',month:'short',year:'numeric'})} · ${data.people.list.length} ${data.people.list.length===1?'person':'people'}: ${names}</p>
+      <p class="warn">This replaces the progress currently on this phone.</p>
+      <div class="actions" style="justify-content:flex-start"><button class="btn primary" id="bkYes">Restore</button><button class="btn" id="bkNo">Cancel</button></div>`;
+    box.hidden=false;
+    $('bkNo').onclick=()=>{box.hidden=true;};
+    $('bkYes').onclick=()=>{
+      try{ P.list.forEach(x=>localStorage.removeItem(stateKey(x.id))); }catch(e){}
+      P={active:data.people.active,list:data.people.list,lastBackup:String(data.saved).slice(0,10)};
+      if(!P.list.some(x=>x.id===P.active)) P.active=P.list[0].id;
+      Object.keys(data.states).forEach(id=>{try{localStorage.setItem(stateKey(id),JSON.stringify(data.states[id]));}catch(e){}});
+      saveP(); box.hidden=true; switchTo(P.active);
+      showBkMsg('Backup restored for '+data.people.list.map(x=>x.name).join(', ')+'.');
+    };
+  };
+  r.readAsText(f);
+});
+// Ask the phone to keep this app's data even when storage is low.
+try{ if(navigator.storage&&navigator.storage.persist) navigator.storage.persist().catch(()=>{}); }catch(e){}
+showBkMsg();
 
 rollover(); render();
 })();
