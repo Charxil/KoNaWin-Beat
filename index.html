@@ -1,0 +1,799 @@
+<!doctype html>
+<html lang="my">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ko Nawin Mala</title>
+<meta name="description" content="81-day Ko Nawin (ကိုးနဝင်း) bead counter with levels and calendar.">
+<meta name="theme-color" content="#7b1e24">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Ko Nawin">
+<style>
+@font-face{font-family:'Padauk';font-style:normal;font-weight:400;font-display:swap;src:url(fonts/padauk-myanmar-400-normal.woff2) format('woff2');unicode-range:U+1000-109F, U+200C-200D, U+25CC, U+A92E, U+A9E0-A9FE, U+AA60-AA7F}
+@font-face{font-family:'Padauk';font-style:normal;font-weight:700;font-display:swap;src:url(fonts/padauk-myanmar-700-normal.woff2) format('woff2');unicode-range:U+1000-109F, U+200C-200D, U+25CC, U+A92E, U+A9E0-A9FE, U+AA60-AA7F}
+@font-face{font-family:'Padauk';font-style:normal;font-weight:400;font-display:swap;src:url(fonts/padauk-latin-400-normal.woff2) format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
+@font-face{font-family:'Padauk';font-style:normal;font-weight:700;font-display:swap;src:url(fonts/padauk-latin-700-normal.woff2) format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
+@font-face{font-family:'Marcellus';font-style:normal;font-weight:400;font-display:swap;src:url(fonts/marcellus-latin-400-normal.woff2) format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
+@font-face{font-family:'Padauk';font-style:normal;font-weight:400;font-display:swap;src:url(fonts/padauk-latin-ext-400-normal.woff2) format('woff2');unicode-range:U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF}
+@font-face{font-family:'Padauk';font-style:normal;font-weight:700;font-display:swap;src:url(fonts/padauk-latin-ext-700-normal.woff2) format('woff2');unicode-range:U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF}
+@font-face{font-family:'Marcellus';font-style:normal;font-weight:400;font-display:swap;src:url(fonts/marcellus-latin-ext-400-normal.woff2) format('woff2');unicode-range:U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF}
+
+/* Layout: one centered column — today's mantra, the mala ring you tap, then the 9×9 level chart */
+:root{
+  --bg:#f7f2ee; --surface:#ffffff; --line:#e6dad3; --fg:#2b1a17; --muted:#7a6460;
+  --saffron:#c26a1c; --maroon:#7b1e24; --done:#2f8f4e; --done-soft:#dcefe2; --bead-empty:#e9ddd5; --cur-soft:#f8e4cf; --missed:#b3261e; --missed-soft:#f7dcd8; --gold-line:#e2b54a; --gold-text:#9a6a00;
+  --f-my:"Padauk","Noto Sans Myanmar","Myanmar Text",system-ui,sans-serif;
+  --f-display:"Marcellus","Georgia",serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#1a1012; --surface:#251719; --line:#3b2729; --fg:#f2e7e2; --muted:#b19c97;
+  --saffron:#e89a4f; --maroon:#d8676d; --done:#4cc27a; --done-soft:#1f3a29; --bead-empty:#3d2a2b; --cur-soft:#43291b; --missed:#ff8a80; --missed-soft:#45201d; --gold-line:#b8902e; --gold-text:#f2c75c; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#1a1012; --surface:#251719; --line:#3b2729; --fg:#f2e7e2; --muted:#b19c97;
+  --saffron:#e89a4f; --maroon:#d8676d; --done:#4cc27a; --done-soft:#1f3a29; --bead-empty:#3d2a2b; --cur-soft:#43291b; --missed:#ff8a80; --missed-soft:#45201d; --gold-line:#b8902e; --gold-text:#f2c75c; color-scheme:dark}
+html,body{background:var(--bg);color:var(--fg)}
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0;-webkit-text-size-adjust:100%}
+[hidden]{display:none!important}
+*,*::before,*::after{box-sizing:border-box}
+body{font-family:var(--f-my);font-size:16px;line-height:1.6}
+.wrap{max-width:560px;margin:0 auto;padding-block:20px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:20px}
+header{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap}
+h1{font-family:var(--f-display);font-weight:400;font-size:1.6rem;margin:0;letter-spacing:.02em;color:var(--maroon)}
+h1 small{font-family:var(--f-my);font-size:.95rem;color:var(--muted);margin-left:6px}
+.eyebrow{font-size:.75rem;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);font-family:var(--f-display)}
+
+.today{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:18px;display:flex;flex-direction:column;gap:14px;align-items:center;text-align:center}
+.meta{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.chip{font-size:.85rem;padding:2px 12px;border-radius:999px;background:var(--cur-soft);color:var(--fg)}
+.chip.day{background:transparent;border:1px solid var(--line)}
+.mantra{font-size:1.9rem;font-weight:700;line-height:1.5;color:var(--maroon);text-wrap:balance;margin:0}
+.pali{font-family:var(--f-display);color:var(--muted);margin-top:-8px}
+.today.done .mantra{color:var(--done)}
+
+.ring-btn{all:unset;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;width:min(100%,320px);aspect-ratio:1;max-width:100%;border-radius:50%;position:relative;display:block}
+.ring-btn:focus-visible{outline:3px solid var(--saffron);outline-offset:4px}
+.ring-btn svg{width:100%;height:100%;display:block}
+.ring-btn:active .center-disc{transform:scale(.97)}
+.center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none}
+.count{font-family:var(--f-display);font-size:3.4rem;line-height:1;font-variant-numeric:tabular-nums}
+.of{color:var(--muted);font-size:.9rem;font-variant-numeric:tabular-nums}
+.tap-hint{font-size:.8rem;color:var(--muted);margin-top:4px}
+.today.done .count{color:var(--done)}
+.flash .bead{animation:pulse .5s ease}
+@keyframes pulse{50%{opacity:.35}}
+@media (prefers-reduced-motion:reduce){.flash .bead{animation:none}}
+
+.rounds{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;align-items:center}
+.pip{width:14px;height:14px;border-radius:50%;border:2px solid var(--saffron)}
+.pip.full{background:var(--saffron)}
+.today.done .pip{border-color:var(--done);background:var(--done)}
+.rounds-label{font-size:.95rem;color:var(--muted);width:100%}
+.status{font-size:.95rem;padding:8px 14px;border-radius:12px;background:var(--done-soft);color:var(--fg)}
+.actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+button.btn{font:inherit;font-size:.9rem;padding:6px 14px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--fg);cursor:pointer}
+button.btn:hover{border-color:var(--saffron)}
+button.btn.primary{background:var(--maroon);border-color:var(--maroon);color:var(--surface)}
+button.btn:focus-visible{outline:2px solid var(--saffron);outline-offset:2px}
+
+section h2{font-family:var(--f-display);font-weight:400;font-size:1.2rem;margin:0 0 10px;color:var(--maroon)}
+.grid{display:grid;grid-template-columns:auto repeat(9,1fr);gap:4px;align-items:stretch}
+.lvl{font-size:.78rem;color:var(--muted);display:flex;align-items:center;padding-right:4px;white-space:nowrap}
+.lvl.cur{color:var(--maroon);font-weight:700}
+.cell{all:unset;cursor:pointer;border-radius:8px;background:var(--surface);border:1px solid var(--line);aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:.95rem;line-height:1.1;min-width:0}
+.cell small{font-size:.6rem;color:var(--muted)}
+.cell.done{background:var(--done);border-color:var(--done);color:var(--surface)}
+.cell.done small{color:var(--surface);opacity:.85}
+.cell.cur{border:2px solid var(--saffron);background:var(--cur-soft)}
+.cell.sel{outline:2px solid var(--maroon);outline-offset:1px}
+.cell:focus-visible{outline:2px solid var(--saffron)}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:.8rem;color:var(--muted);margin-top:10px}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-1px;margin-right:5px;border:1px solid var(--line)}
+
+.detail{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:8px;margin-top:12px}
+.detail p{margin:0}
+.detail .warn{font-size:.85rem;color:var(--muted)}
+
+.cal-head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px}
+.cal-head h3{margin:0;font-family:var(--f-display);font-weight:400;font-size:1.05rem}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.dow{font-size:.68rem;color:var(--muted);text-align:center;line-height:1.2;padding-bottom:2px}
+.dcell{all:unset;box-sizing:border-box;aspect-ratio:1;border-radius:8px;border:1px solid var(--line);background:var(--surface);display:flex;flex-direction:column;align-items:center;justify-content:center;font-variant-numeric:tabular-nums;min-width:0;cursor:pointer;line-height:1.15}
+.dcell .dn{font-size:.95rem}
+.dcell .tag{font-size:.6rem;color:var(--muted);white-space:nowrap}
+.dcell.empty{border:none;background:transparent;cursor:default}
+.dcell.none{background:transparent;color:var(--muted);cursor:default}
+.dcell.planned{border-style:dashed}
+.dcell.done{background:var(--done);border-color:var(--done);color:var(--surface)}
+.dcell.done .tag{color:var(--surface);opacity:.85}
+.dcell.cur{border:2px solid var(--saffron);background:var(--cur-soft)}
+.dcell.missed{background:var(--missed-soft);border-color:var(--missed);color:var(--missed)}
+.dcell.missed .tag{color:var(--missed)}
+.dcell.past{opacity:.55}
+.dcell.start{border:2px dashed var(--maroon)}
+.status.warn{background:var(--missed-soft)}
+.status{display:flex;flex-direction:column;gap:8px;align-items:center}
+.dcell.istoday .dn{font-weight:700;text-decoration:underline;text-underline-offset:3px}
+.dcell.sel{outline:2px solid var(--maroon);outline-offset:1px}
+.dcell:focus-visible{outline:2px solid var(--saffron)}
+.lvlsum{display:flex;flex-direction:column;gap:6px;margin-top:14px}
+.lvlbox{border:1px solid var(--line);border-radius:10px;background:var(--surface);overflow:hidden}
+.lvlbox[open]{border-color:var(--saffron)}
+.lrow{display:grid;grid-template-columns:auto 1fr auto auto;gap:10px;align-items:center;font-size:.9rem;padding:8px 10px;cursor:pointer;list-style:none}
+.lrow::-webkit-details-marker{display:none}
+.lrow:focus-visible{outline:2px solid var(--saffron);outline-offset:-2px}
+.chev{color:var(--muted);transition:transform .15s}
+.lvlbox[open] .chev{transform:rotate(90deg)}
+.days{list-style:none;margin:0;padding:0 10px 10px;display:flex;flex-direction:column;gap:6px}
+.dayrow{display:grid;grid-template-columns:4.6em 1fr auto;gap:10px;align-items:center;padding:8px 10px;border-radius:8px;background:var(--bg);border:1px solid transparent}
+.dayrow.done{background:var(--done-soft)}
+.dayrow.cur{border-color:var(--saffron);background:var(--cur-soft)}
+.dayrow.missed{background:var(--missed-soft)}
+.dd{font-size:.78rem;color:var(--muted);line-height:1.3;font-variant-numeric:tabular-nums}
+.dd b{display:block;color:var(--fg);font-size:.9rem}
+.dm{min-width:0}
+.dm .say{font-weight:700;color:var(--maroon);line-height:1.4}
+.dm .pl{font-family:var(--f-display);font-size:.8rem;color:var(--muted)}
+.dc{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.dc b{display:block;font-size:1.05rem}
+.dc span{font-size:.72rem;color:var(--muted)}
+.dc .ok{color:var(--done);font-size:.72rem}
+.lrow .nm{font-weight:700;min-width:5.5em}
+.lrow .rg{color:var(--muted);font-variant-numeric:tabular-nums;min-width:0}
+.badge{font-size:.75rem;padding:1px 10px;border-radius:999px;border:1px solid var(--line);white-space:nowrap}
+.badge.done{background:var(--done);border-color:var(--done);color:var(--surface)}
+.badge.cur{background:var(--cur-soft);border-color:var(--saffron)}
+.bar{height:6px;border-radius:3px;background:var(--bead-empty);overflow:hidden;grid-column:1/-1}
+.bar span{display:block;height:100%;background:var(--done)}
+.settings{display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:.9rem;color:var(--muted)}
+select{font:inherit;padding:4px 8px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--fg)}
+.people{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.people .lbl{font-size:.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;font-family:var(--f-display);margin-right:4px}
+.person{all:unset;box-sizing:border-box;padding:4px 12px;border-radius:999px;border:1px solid var(--line);background:var(--surface);cursor:pointer;font-size:.9rem;line-height:1.4;display:inline-flex;gap:6px;align-items:baseline;max-width:100%}
+.person small{font-size:.7rem;color:var(--muted)}
+.person.on{background:var(--maroon);border-color:var(--maroon);color:var(--surface)}
+.person.on small{color:var(--surface);opacity:.8}
+.person.add{border-style:dashed;color:var(--muted)}
+.person:focus-visible{outline:2px solid var(--saffron);outline-offset:2px}
+.field{display:flex;flex-direction:column;gap:4px;font-size:.85rem;color:var(--muted)}
+.field input{font:inherit;font-size:1rem;padding:8px 10px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--fg);width:100%;box-sizing:border-box}
+.field input:focus-visible{outline:2px solid var(--saffron);outline-offset:1px}
+.show-history .main{display:none}
+.hist{display:flex;flex-direction:column;gap:16px}
+.hist-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.hist-head h2{margin:0}
+.award{background:var(--surface);border:1px solid var(--gold-line);border-radius:18px;padding:20px 16px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px}
+.award svg{width:min(60%,200px);height:auto;max-width:100%}
+.award .t1{font-size:1.35rem;font-weight:700;color:var(--gold-text);line-height:1.4}
+.award .t2{font-family:var(--f-display);font-size:1.05rem}
+.award .t3{font-size:.85rem;color:var(--muted)}
+.award .num{font-family:var(--f-display);font-size:.75rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+#histBtn{border-color:var(--gold-line);color:var(--gold-text);font-weight:700}
+.credit{text-align:center;font-size:.85rem;color:var(--muted);padding-top:12px;border-top:1px solid var(--line)}
+.credit strong{font-family:var(--f-display);font-weight:400;color:var(--maroon);letter-spacing:.03em}
+.note{font-size:.85rem;color:var(--muted);max-width:65ch}
+</style>
+</head>
+<body>
+
+
+<div class="wrap">
+  <header>
+    <h1>Ko Nawin Mala <small>ကိုးနဝင်း</small></h1>
+    <div style="display:flex;gap:10px;align-items:center"><button class="btn" id="histBtn" hidden>History · မှတ်တမ်း</button><span class="eyebrow" id="todayDate"></span></div>
+  </header>
+
+  <div class="people" id="people"></div>
+  <div class="detail" id="personPanel" hidden></div>
+
+  <div class="today main" id="today">
+    <div class="meta">
+      <span class="chip" id="lvlChip"></span>
+      <span class="chip day" id="dayChip"></span>
+    </div>
+    <p class="mantra" id="mantra"></p>
+    <div class="pali" id="pali"></div>
+
+    <button class="ring-btn" id="ring" aria-label="Count one bead">
+      <svg viewBox="0 0 320 320" id="ringSvg" aria-hidden="true"></svg>
+      <div class="center">
+        <div class="count" id="count">0</div>
+        <div class="of" id="of"></div>
+        <div class="tap-hint" id="hint">Tap to count</div>
+      </div>
+    </button>
+
+    <div class="rounds" id="rounds"></div>
+    <div class="status" id="status" hidden></div>
+    <div class="actions">
+      <button class="btn" id="undo">Undo one bead</button>
+      <button class="btn" id="resetDay">Restart today</button>
+    </div>
+  </div>
+
+  <section class="main">
+    <h2>Calendar · ပြက္ခဒိန်</h2>
+    <div class="cal-head">
+      <button class="btn" id="calPrev" aria-label="Previous month">‹</button>
+      <h3 id="calTitle"></h3>
+      <button class="btn" id="calNext" aria-label="Next month">›</button>
+    </div>
+    <div class="cal" id="cal"></div>
+    <div class="legend">
+      <span><i style="background:var(--done);border-color:var(--done)"></i>Completed</span>
+      <span><i style="background:var(--cur-soft);border-color:var(--saffron)"></i>Current</span>
+      <span><i style="border-style:dashed"></i>Planned</span>
+      <span><i style="background:var(--missed-soft);border-color:var(--missed)"></i>Missed</span>
+      <span>L = level · D = day</span>
+    </div>
+    <div class="detail" id="calDetail" hidden></div>
+    <h3 style="font-family:var(--f-display);font-weight:400;font-size:1.05rem;margin:18px 0 0">Tap a level to see each day</h3>
+    <div class="lvlsum" id="lvlsum"></div>
+  </section>
+
+  <section class="main">
+    <h2>Levels · အဆင့် ၉ ဆင့်</h2>
+    <div class="grid" id="grid" role="grid"></div>
+    <div class="legend">
+      <span><i style="background:var(--done);border-color:var(--done)"></i>Completed</span>
+      <span><i style="background:var(--cur-soft);border-color:var(--saffron)"></i>Current day</span>
+      <span>Number = rounds (ပတ်) to count</span>
+    </div>
+    <div class="detail" id="detail" hidden></div>
+  </section>
+
+  <section class="main">
+    <h2>Settings</h2>
+    <div class="settings">
+      <label for="bpr">Beads in one round (ပတ်)</label>
+      <select id="bpr">
+        <option value="108">108</option>
+        <option value="54">54</option>
+        <option value="27">27</option>
+        <option value="21">21</option>
+        <option value="custom">Other number…</option>
+      </select>
+      <span id="bprCustomWrap" hidden style="display:inline-flex;gap:6px;align-items:center">
+        <input id="bprCustom" type="number" inputmode="numeric" min="1" max="1000" step="1" style="font:inherit;width:6em;padding:4px 8px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--fg)" aria-label="Beads in one round">
+        <button class="btn primary" id="bprSet">Set</button>
+      </span>
+    </div>
+    <p class="note" id="bprMsg" style="margin:6px 0 0">Any number from 1 to 1000. Changing it during a round keeps the beads already counted, unless the new number is smaller.</p>
+    <div class="settings" style="margin-top:12px">
+      <button class="btn" id="startOver">Start over from Level 1</button>
+      <span id="startOverNote">Begins again at Level 1, Day 1 on a Monday.</span>
+    </div>
+    <div class="detail" id="startOverAsk" hidden></div>
+    <p class="note">Each day follows the chart: say the day's Buddha attribute for the listed number of rounds. When every round is done, the day turns green. The next day opens automatically at 00:00, but only if today is completed. If a day is missed, the practice starts again from Level 1, Day 1 on the next Monday (today, if today is Monday). The calendar shows completed days, today, the planned days ahead and any missed day. Each person has their own progress. Tap a name at the top to switch, or tap the selected name to rename or remove it. Progress is saved on this phone.</p>
+  </section>
+
+  <section class="hist" id="historyView" hidden></section>
+
+  <footer class="credit">Created by <strong>Aye Chan</strong></footer>
+</div>
+
+<script>
+(function(){
+const GUNA=[null,
+ {my:'အရဟံ',pali:'Arahaṃ'},
+ {my:'သမ္မာသမ္ဗုဒ္ဓေါ',pali:'Sammāsambuddho'},
+ {my:'ဝိဇ္ဇာစရဏသမ္ပန္နော',pali:'Vijjācaraṇasampanno'},
+ {my:'သုဂတော',pali:'Sugato'},
+ {my:'လောကဝိဒူ',pali:'Lokavidū'},
+ {my:'အနုတ္တရော ပုရိသဒမ္မသာရထိ',pali:'Anuttaro purisadammasārathi'},
+ {my:'သတ္ထာ ဒေဝမနုဿာနံ',pali:'Satthā devamanussānaṃ'},
+ {my:'ဗုဒ္ဓေါ',pali:'Buddho'},
+ {my:'ဘဂဝါ',pali:'Bhagavā'}];
+// Level 1 sequence from the chart; each following level shifts every attribute by one.
+const ROW1=[2,9,4,7,5,3,6,1,8];
+const DAYS=['တနင်္ဂနွေ','တနင်္လာ','အင်္ဂါ','ဗုဒ္ဓဟူး','ကြာသပတေး','သောကြာ','စနေ'];
+const DAYS_EN=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+const LEVELS=['ပထမ','ဒုတိယ','တတိယ','စတုတ္ထ','ပဉ္စမ','ဆဋ္ဌမ','သတ္တမ','အဋ္ဌမ','နဝမ'];
+const MYD='၀၁၂၃၄၅၆၇၈၉';
+const my=n=>String(n).replace(/\d/g,d=>MYD[d]);
+const TOTAL=81;
+
+function cellInfo(idx){
+  const L=Math.floor(idx/9), i=idx%9;
+  const g=((ROW1[i]-1+L)%9)+1;
+  const wd=(1+idx)%7; // chart starts on Monday
+  return {L,i,g,rounds:g,wd};
+}
+function todayKey(d=new Date()){
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+
+const KEY='konawin-mala-v1';
+// ---- People: each person has their own saved progress ----
+const PKEY='konawin-people-v1';
+let P={active:null,list:[]};
+try{const raw=localStorage.getItem(PKEY); if(raw) P=Object.assign(P,JSON.parse(raw));}catch(e){}
+function saveP(){try{localStorage.setItem(PKEY,JSON.stringify(P));}catch(e){}}
+const stateKey=id=>KEY+':'+id;
+const newId=()=>'p'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+if(!P.list.length){ // first run, or upgrade from the single-person version
+  const id=newId(); let old=null;
+  try{old=localStorage.getItem(KEY);}catch(e){}
+  P.list=[{id,name:'Me'}]; P.active=id;
+  if(old){try{localStorage.setItem(stateKey(id),old);}catch(e){}}
+  saveP();
+}
+if(!P.list.some(x=>x.id===P.active)) P.active=P.list[0].id;
+function blankState(){return {cur:0,beads:0,rounds:0,bpr:108,done:{},startDate:null,past:{},awards:[]};}
+function loadState(id){
+  let st=blankState();
+  try{const raw=localStorage.getItem(stateKey(id)); if(raw) st=Object.assign(st,JSON.parse(raw));}catch(e){}
+  // The chart's Day 1 is a Monday, so day N always falls on startDate + N.
+  if(!st.startDate) st.startDate=todayKey(addDays(keyToDate(todayKey()),-st.cur));
+  if(!st.past) st.past={};
+  if(!Array.isArray(st.awards)) st.awards=[];
+  return st;
+}
+let S=loadState(P.active);
+function save(){try{localStorage.setItem(stateKey(P.active),JSON.stringify(S));}catch(e){}}
+const esc=t=>String(t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+let selected=null;
+const $=id=>document.getElementById(id);
+
+function isCurDone(){return !!S.done[S.cur];}
+function dateOf(i){return todayKey(addDays(keyToDate(S.startDate),i));}
+function nextMonday(){ // today if it is Monday, otherwise the coming Monday
+  const t=keyToDate(todayKey()); return todayKey(addDays(t,(8-t.getDay())%7));
+}
+function upcomingMonday(){ // always the Monday after today
+  const t=keyToDate(todayKey()); return todayKey(addDays(t,((8-t.getDay())%7)||7));
+}
+function phase(){
+  const t=todayKey();
+  if(t<S.startDate) return 'waiting';
+  if(!isCurDone() && dateOf(S.cur)<t) return 'missed';
+  return 'active';
+}
+
+function rollover(){
+  // Move to the next day after midnight, only if the current day was completed on its own date.
+  const t=todayKey(); let changed=false;
+  while(S.cur<TOTAL-1 && S.done[S.cur] && dateOf(S.cur)<t){
+    S.cur++; S.beads=0; S.rounds=0; changed=true;
+  }
+  if(changed){save();render();}
+}
+
+let restartArmed=false;
+function restart(){
+  if(!restartArmed){restartArmed=true;render();setTimeout(()=>{restartArmed=false;render();},4000);return;}
+  restartArmed=false;
+  // keep a faint record of the previous attempt on the calendar
+  for(let i=0;i<TOTAL;i++){ if(S.done[i]) S.past[dateOf(i)]='done'; }
+  S.past[dateOf(S.cur)]='missed';
+  S.cur=0;S.beads=0;S.rounds=0;S.done={};S.startDate=nextMonday();
+  selected=null;calMonth=null;save();render();
+}
+
+function doStartOver(key){
+  for(let i=0;i<TOTAL;i++){ if(S.done[i]&&S.done[i]!=='prior') S.past[dateOf(i)]='done'; }
+  S.cur=0;S.beads=0;S.rounds=0;S.done={};S.startDate=key;
+  selected=null;calMonth=null;$('startOverAsk').hidden=true;save();render();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function startOver(){
+  const box=$('startOverAsk');
+  if(!box.hidden){box.hidden=true;return;}
+  const df={weekday:'long',day:'numeric',month:'short'};
+  const t=todayKey(), up=upcomingMonday(), isMon=keyToDate(t).getDay()===1;
+  box.innerHTML=`<p><strong>${isMon?'Which Monday do you want to start on?':'Start over from Level 1?'}</strong></p>
+    <p class="warn">Today's and all earlier progress will be cleared. It stays faded on the calendar.</p>
+    <div class="actions" style="justify-content:flex-start">
+      ${isMon?`<button class="btn primary" data-k="${t}">Today · ${fmt(t,df)}</button>`:''}
+      <button class="btn ${isMon?'':'primary'}" data-k="${up}">${isMon?'Next Monday':'Start'} · ${fmt(up,df)}</button>
+      <button class="btn" data-k="">Cancel</button>
+    </div>`;
+  box.hidden=false;
+  box.querySelectorAll('button').forEach(b=>b.onclick=()=>{ if(b.dataset.k) doStartOver(b.dataset.k); else box.hidden=true; });
+}
+
+function switchTo(id){
+  P.active=id; saveP(); S=loadState(id);
+  selected=null; calMonth=null; openLevels.clear(); openLevels.add(Math.floor(S.cur/9));
+  showHistory(false);
+  syncBpr(); $('personPanel').hidden=true; $('startOverAsk').hidden=true;
+  rollover(); render();
+}
+function personStatus(st){
+  const t=todayKey();
+  if(t<st.startDate) return 'Starts '+fmt(st.startDate);
+  const all=Object.keys(st.done).length>=TOTAL;
+  if(all) return 'Finished';
+  const c=cellInfo(st.cur); return `L${c.L+1}·D${c.i+1}${st.done[st.cur]?' ✓':''}`;
+}
+function renderPeople(){
+  let h='<span class="lbl">Person</span>';
+  P.list.forEach(x=>{
+    const st=x.id===P.active?S:loadState(x.id);
+    h+=`<button class="person ${x.id===P.active?'on':''}" data-id="${x.id}" aria-pressed="${x.id===P.active}">${esc(x.name)} <small>${personStatus(st)}</small></button>`;
+  });
+  h+='<button class="person add" data-add="1">+ Add person</button>';
+  $('people').innerHTML=h;
+}
+let removeArmed=false;
+function showPanel(mode){
+  const box=$('personPanel'); const df={weekday:'short',day:'numeric',month:'short'};
+  const t=todayKey(), up=upcomingMonday(), isMon=keyToDate(t).getDay()===1;
+  if(mode==='add'){
+    box.innerHTML=`<p><strong>Add a person</strong></p>
+      <label class="field" for="pName">Name<input id="pName" maxlength="30" placeholder="e.g. Mother" autocomplete="off"></label>
+      <p class="warn">When does their Level 1 start?</p>
+      <div class="actions" style="justify-content:flex-start">
+        ${isMon?`<button class="btn primary" data-start="${t}">Today · ${fmt(t,df)}</button>`:''}
+        <button class="btn ${isMon?'':'primary'}" data-start="${up}">${isMon?'Next Monday':'Monday'} · ${fmt(up,df)}</button>
+        <button class="btn" data-cancel="1">Cancel</button>
+      </div>
+      <p class="warn">Already partway through? Add them starting today, then tap their current day in the Levels chart and choose “I am on this day today”.</p>`;
+    box.hidden=false; $('pName').focus();
+    box.querySelectorAll('[data-start]').forEach(b=>b.onclick=()=>{
+      const name=$('pName').value.trim(); if(!name){$('pName').focus();$('pName').placeholder='Please type a name';return;}
+      const id=newId(); P.list.push({id,name});
+      const st=blankState(); st.startDate=b.dataset.start; st.bpr=S.bpr;
+      try{localStorage.setItem(stateKey(id),JSON.stringify(st));}catch(e){}
+      switchTo(id);
+    });
+  } else {
+    const me=P.list.find(x=>x.id===P.active);
+    box.innerHTML=`<p><strong>${esc(me.name)}</strong> · ${personStatus(S)}</p>
+      <label class="field" for="pRename">Name<input id="pRename" maxlength="30" value="${esc(me.name)}" autocomplete="off"></label>
+      <div class="actions" style="justify-content:flex-start">
+        <button class="btn primary" id="pSave">Save name</button>
+        ${P.list.length>1?`<button class="btn" id="pRemove">${removeArmed?'Tap again to remove':'Remove this person'}</button>`:''}
+        <button class="btn" data-cancel="1">Close</button>
+      </div>
+      ${P.list.length>1?'<p class="warn">Removing a person deletes their progress on this phone.</p>':''}`;
+    box.hidden=false;
+    $('pSave').onclick=()=>{const v=$('pRename').value.trim(); if(v){me.name=v;saveP();} box.hidden=true; renderPeople();};
+    const rm=$('pRemove'); if(rm) rm.onclick=()=>{
+      if(!removeArmed){removeArmed=true;showPanel('edit');setTimeout(()=>{removeArmed=false;},4000);return;}
+      removeArmed=false;
+      try{localStorage.removeItem(stateKey(P.active));}catch(e){}
+      P.list=P.list.filter(x=>x.id!==P.active); switchTo(P.list[0].id);
+    };
+  }
+  box.querySelectorAll('[data-cancel]').forEach(b=>b.onclick=()=>{box.hidden=true;});
+}
+
+function pagodaSVG(uid){
+  return `<svg viewBox="0 0 160 200" role="img" aria-label="Golden pagoda">
+  <defs>
+    <linearGradient id="g${uid}" x1="0" x2="1"><stop offset="0" stop-color="#b8780f"/><stop offset=".35" stop-color="#ffe08a"/><stop offset=".6" stop-color="#e9b23a"/><stop offset="1" stop-color="#9c6408"/></linearGradient>
+    <radialGradient id="h${uid}" cx=".5" cy=".42" r=".5"><stop offset="0" stop-color="#ffd970" stop-opacity=".55"/><stop offset="1" stop-color="#ffd970" stop-opacity="0"/></radialGradient>
+  </defs>
+  <circle cx="80" cy="88" r="80" fill="url(#h${uid})"/>
+  <g fill="url(#g${uid})" stroke="#8a5a06" stroke-width=".8">
+    <rect x="18" y="178" width="124" height="14" rx="2"/>
+    <rect x="30" y="166" width="100" height="12" rx="2"/>
+    <rect x="40" y="155" width="80" height="11" rx="2"/>
+    <path d="M44 155 C44 124 60 106 80 96 C100 106 116 124 116 155 Z"/>
+    <rect x="62" y="88" width="36" height="8" rx="3"/>
+    <rect x="66" y="81" width="28" height="7" rx="3"/>
+    <path d="M67 81 C69 64 75 54 80 40 C85 54 91 64 93 81 Z"/>
+    <ellipse cx="80" cy="40" rx="9" ry="3"/>
+    <ellipse cx="80" cy="33" rx="7" ry="2.5"/>
+    <ellipse cx="80" cy="27" rx="5" ry="2"/>
+    <rect x="79" y="12" width="2" height="15"/>
+    <path d="M80 4 L84 10 L80 16 L76 10 Z"/>
+  </g>
+  <g stroke="#fff3c4" stroke-width="1.4" fill="none" opacity=".7"><path d="M58 150 C58 128 66 115 74 108"/></g>
+</svg>`;
+}
+const longDate=k=>keyToDate(k).toLocaleDateString(undefined,{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+function renderHistory(){
+  const v=$('historyView'), has=S.awards.length>0;
+  $('histBtn').hidden=!has;
+  if(!has){ v.hidden=true; document.body.classList.remove('show-history'); return; }
+  const me=P.list.find(x=>x.id===P.active);
+  let h=`<div class="hist-head"><h2>History · မှတ်တမ်း</h2><button class="btn" id="histBack">Back to counter</button></div>`;
+  const ORD=['1st','2nd','3rd'];
+  const tally=S.awards.length>1?`<p class="note" style="text-align:center;margin:0">${esc(me?me.name:'')} has completed Ko Nawin ${my(S.awards.length)} ကြိမ် · ${S.awards.length} times</p>`:'';
+  h+=tally;
+  S.awards.forEach((a,k)=>{
+    const n=k+1, ord=ORD[k]||n+'th';
+    h+=`<div class="award">${pagodaSVG(n)}
+      <span class="num">${ord} completion · ${k<9?LEVELS[k]+' အကြိမ်':my(n)+' ကြိမ်မြောက်'}</span>
+      <span class="t1">ကိုးနဝင်း ၉ ဆင့် ပြီးမြောက်</span>
+      <span class="t2">${esc(me?me.name:'')} completed all 9 levels</span>
+      <span class="t2">on ${longDate(a.end)}</span>
+      <span class="t3">Started ${longDate(a.start)} · ${my(81)} ရက် · 81 days · Sadhu Sadhu Sadhu</span>
+    </div>`;
+  });
+  v.innerHTML=h;
+  $('histBack').onclick=()=>showHistory(false);
+}
+function showHistory(on){
+  if(on && !S.awards.length) return;
+  document.body.classList.toggle('show-history',on);
+  $('historyView').hidden=!on;
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function count(){
+  if(isCurDone()||phase()!=='active') return;
+  const info=cellInfo(S.cur);
+  S.beads++;
+  try{navigator.vibrate&&navigator.vibrate(8);}catch(e){}
+  if(S.beads>=S.bpr){
+    S.beads=0; S.rounds++;
+    try{navigator.vibrate&&navigator.vibrate([30,40,30]);}catch(e){}
+    flash();
+    if(S.rounds>=info.rounds){S.rounds=info.rounds; S.done[S.cur]=todayKey();
+      if(S.cur===TOTAL-1 && !S.awards.some(a=>a.start===S.startDate)){
+        S.awards.push({start:S.startDate,end:todayKey()}); setTimeout(()=>showHistory(true),900);
+      }
+    }
+  }
+  save(); render();
+}
+function undo(){
+  if(isCurDone()){ // reopen the finished day
+    delete S.done[S.cur]; S.rounds=cellInfo(S.cur).rounds-1; S.beads=S.bpr-1;
+    if(S.cur===TOTAL-1) S.awards=S.awards.filter(a=>a.start!==S.startDate);
+  }else if(S.beads>0){S.beads--;}
+  else if(S.rounds>0){S.rounds--; S.beads=S.bpr-1;}
+  save(); render();
+}
+let resetArmed=false;
+function resetDay(){
+  const b=$('resetDay');
+  if(!resetArmed){resetArmed=true;b.textContent='Tap again to restart';setTimeout(()=>{resetArmed=false;b.textContent='Restart today';},3000);return;}
+  resetArmed=false;b.textContent='Restart today';
+  delete S.done[S.cur]; S.beads=0; S.rounds=0; save(); render();
+}
+function flash(){const t=$('today');t.classList.remove('flash');void t.offsetWidth;t.classList.add('flash');}
+
+function drawRing(){
+  const svg=$('ringSvg'); const n=S.bpr; const done=isCurDone();
+  const cx=160,cy=160,R=138;
+  const r=Math.min(9,Math.PI*R/(n+1)*0.82);
+  let h='';
+  h+=`<circle class="center-disc" cx="160" cy="160" r="${R-22}" fill="var(--bg)" style="transform-origin:160px 160px;transition:transform .08s"/>`;
+  h+=`<circle cx="160" cy="160" r="${R}" fill="none" stroke="var(--line)" stroke-width="1"/>`;
+  for(let k=0;k<n;k++){
+    const a=-Math.PI/2+(2*Math.PI*(k+1))/(n+1);
+    const x=cx+R*Math.cos(a), y=cy+R*Math.sin(a);
+    let fill='var(--bead-empty)', stroke='none', sw=0;
+    if(done) fill='var(--done)';
+    else if(k<S.beads) fill='var(--saffron)';
+    else if(k===S.beads){fill='var(--surface)';stroke='var(--saffron)';sw=2;}
+    h+=`<circle class="bead" cx="${x.toFixed(2)}" cy="${y.toFixed(2)}" r="${(k===S.beads&&!done?r*1.35:r).toFixed(2)}" fill="${fill}" stroke="${stroke}" stroke-width="${sw}"/>`;
+  }
+  // guru bead at the top
+  h+=`<circle cx="${cx}" cy="${cy-R}" r="${Math.max(r*1.9,7)}" fill="${done?'var(--done)':'var(--maroon)'}"/>`;
+  svg.innerHTML=h;
+}
+
+function render(){
+  const info=cellInfo(S.cur); const g=GUNA[info.g]; const done=isCurDone();
+  const all=Object.keys(S.done).length>=TOTAL;
+  const now=new Date();
+  $('todayDate').textContent=now.toLocaleDateString(undefined,{weekday:'short',day:'numeric',month:'short'});
+  $('lvlChip').textContent=`${LEVELS[info.L]} အဆင့် · Level ${info.L+1} · Day ${info.i+1}/9`;
+  $('dayChip').textContent=`${DAYS[info.wd]} · ${fmt(dateOf(S.cur),{weekday:'short',day:'numeric',month:'short'})}`;
+  const ph=phase();
+  $('mantra').textContent=g.my;
+  $('pali').textContent=`${g.pali} — ${my(info.rounds)} ပတ် (${info.rounds} rounds)`;
+  $('today').classList.toggle('done',done);
+  $('count').textContent=done?'✓':S.beads;
+  $('of').textContent=done?'Completed':`of ${S.bpr}`;
+  $('hint').textContent=done?'':'Tap to count';
+  $('ring').setAttribute('aria-label',done?'Today completed':`Count one bead, ${S.beads} of ${S.bpr}`);
+  drawRing();
+  let p='';
+  for(let k=0;k<info.rounds;k++) p+=`<span class="pip ${k<S.rounds?'full':''}"></span>`;
+  p+=`<span class="rounds-label">Round ${my(Math.min(S.rounds+(done?0:1),info.rounds))} / ${my(info.rounds)} ပတ်</span>`;
+  $('rounds').innerHTML=p;
+  const st=$('status');
+  st.classList.toggle('warn',ph==='missed');
+  $('hint').textContent=done?'':ph==='waiting'?'Not started yet':ph==='missed'?'Day missed':'Tap to count';
+  $('ring').disabled=ph!=='active'||done;
+  if(ph==='waiting'){
+    st.hidden=false;
+    const days=Math.round((keyToDate(S.startDate)-keyToDate(todayKey()))/864e5);
+    st.innerHTML=`<span>Level 1 starts on <strong>${fmt(S.startDate,{weekday:'long',day:'numeric',month:'long'})}</strong> (တနင်္လာ) · in ${days} day${days===1?'':'s'}.</span>`;
+  } else if(ph==='missed'){
+    st.hidden=false;
+    st.innerHTML=`<span>ရက်ပျက်သွားပါသည် · You missed <strong>${fmt(dateOf(S.cur),{weekday:'short',day:'numeric',month:'short'})}</strong> (Level ${info.L+1}, Day ${info.i+1}). Start again from Level 1 on Monday, ${fmt(nextMonday(),{day:'numeric',month:'short'})}.</span><button class="btn primary" id="restartBtn">${restartArmed?'Tap again to confirm':'Restart on Monday '+fmt(nextMonday())}</button>`;
+    $('restartBtn').onclick=restart;
+  } else if(done){
+    st.hidden=false;
+    if(all||S.cur===TOTAL-1) st.textContent='ကိုးနဝင်း ပြီးမြောက်ပါပြီ · All 81 days completed. Sadhu! Your golden pagoda is in History.';
+    else{
+      const mid=new Date(now);mid.setHours(24,0,0,0);
+      const ms=mid-now,h=Math.floor(ms/3.6e6),m=Math.floor(ms%3.6e6/6e4);
+      const nx=cellInfo(S.cur+1);
+      st.textContent=`ပြီးပါပြီ ✓ Next: ${GUNA[nx.g].my} (${my(nx.rounds)} ပတ်) opens at 00:00 · in ${h}h ${m}m`;
+    }
+  } else st.hidden=true;
+  $('startOverNote').textContent=keyToDate(todayKey()).getDay()===1?'Begins again at Level 1, Day 1 today or next Monday — you choose.':'Begins again at Level 1, Day 1 on '+fmt(upcomingMonday(),{weekday:'long',day:'numeric',month:'short'})+'.';
+  renderPeople();
+  renderGrid();
+  renderHistory();
+}
+
+function renderGrid(){
+  const grid=$('grid'); let h='';
+  const curL=Math.floor(S.cur/9);
+  for(let L=0;L<9;L++){
+    h+=`<div class="lvl ${L===curL?'cur':''}">${LEVELS[L]}</div>`;
+    for(let i=0;i<9;i++){
+      const idx=L*9+i, c=cellInfo(idx);
+      const cls=['cell'];
+      if(S.done[idx]) cls.push('done');
+      if(idx===S.cur&&!S.done[idx]) cls.push('cur');
+      if(idx===S.cur&&S.done[idx]) cls.push('cur','done');
+      if(idx===selected) cls.push('sel');
+      h+=`<button class="${cls.join(' ')}" data-i="${idx}" aria-label="Level ${L+1} day ${i+1}, ${DAYS_EN[c.wd]}, ${GUNA[c.g].pali}, ${c.rounds} rounds"><span>${my(c.rounds)}</span><small>${DAYS[c.wd].slice(0,2)}</small></button>`;
+    }
+  }
+  grid.innerHTML=h;
+  renderCal();
+  renderDetail();
+}
+
+// ---- Calendar mapping ----
+function keyToDate(k){const [y,m,d]=k.split('-').map(Number);return new Date(y,m-1,d);}
+function addDays(d,n){const x=new Date(d);x.setDate(x.getDate()+n);return x;}
+function schedule(){
+  // Returns date key for each of the 81 days: real dates for completed days, projected dates for the rest.
+  const out=new Array(TOTAL), ph=phase();
+  for(let i=0;i<TOTAL;i++){
+    const key=dateOf(i);
+    let status='planned';
+    if(S.done[i]) status=i===S.cur?'cur-done':'done';
+    else if(i===S.cur) status=ph==='missed'?'missed':ph==='waiting'?'planned':'cur';
+    out[i]={key,status};
+  }
+  return out;
+}
+let calMonth=null;
+const fmt=(k,o)=>keyToDate(k).toLocaleDateString(undefined,o||{day:'numeric',month:'short'});
+function renderCal(){
+  const sch=schedule(), byDate={};
+  sch.forEach((s,i)=>{byDate[s.key]=i;});
+  if(!calMonth){const d=keyToDate(sch[S.cur].key);calMonth=new Date(d.getFullYear(),d.getMonth(),1);}
+  $('calTitle').textContent=calMonth.toLocaleDateString(undefined,{month:'long',year:'numeric'});
+  let h='';
+  DAYS.forEach((d,i)=>{h+=`<div class="dow">${DAYS_EN[i].slice(0,3)}<br>${d.slice(0,3)}</div>`;});
+  const first=calMonth.getDay(), dim=new Date(calMonth.getFullYear(),calMonth.getMonth()+1,0).getDate();
+  for(let k=0;k<first;k++) h+='<div class="dcell empty"></div>';
+  const tk=todayKey();
+  for(let d=1;d<=dim;d++){
+    const key=todayKey(new Date(calMonth.getFullYear(),calMonth.getMonth(),d));
+    const idx=byDate[key];
+    const cls=['dcell'];
+    if(key===tk) cls.push('istoday');
+    if(idx===undefined){
+      const p=S.past[key];
+      if(p){cls.push(p==='missed'?'missed':'done','past');h+=`<div class="${cls.join(' ')}" title="Previous attempt"><span class="dn">${d}</span><span class="tag">${p==='missed'?'Missed':'Earlier'}</span></div>`;continue;}
+      cls.push('none');h+=`<div class="${cls.join(' ')}"><span class="dn">${d}</span></div>`;continue;}
+    const s=sch[idx], c=cellInfo(idx);
+    if(s.status==='done'||s.status==='cur-done') cls.push('done');
+    if(s.status==='cur'||s.status==='cur-done') cls.push('cur');
+    if(s.status==='missed') cls.push('missed');
+    if(s.status==='planned') cls.push('planned');
+    if(idx===0&&s.status==='planned') cls.push('start');
+    if(idx===selected&&detailHost==='calDetail') cls.push('sel');
+    h+=`<button class="${cls.join(' ')}" data-i="${idx}" aria-label="${fmt(key,{day:'numeric',month:'long'})}: level ${c.L+1} day ${c.i+1}, ${GUNA[c.g].pali}, ${s.status}"><span class="dn">${d}</span><span class="tag">L${c.L+1}·D${c.i+1}</span></button>`;
+  }
+  $('cal').innerHTML=h;
+  // level summary
+  let l='';
+  for(let L=0;L<9;L++){
+    const a=sch[L*9].key,b=sch[L*9+8].key;
+    let n=0; for(let i=L*9;i<L*9+9;i++) if(S.done[i]) n++;
+    const curIn=Math.floor(S.cur/9)===L;
+    const badge=n===9?'<span class="badge done">Completed</span>':curIn?`<span class="badge cur">Current · ${n}/9</span>`:'<span class="badge">Upcoming</span>';
+    let rows='';
+    for(let i=L*9;i<L*9+9;i++){
+      const c=cellInfo(i), g=GUNA[c.g], st=sch[i].status;
+      const rc=st==='done'||st==='cur-done'?'done':st==='cur'?'cur':st==='missed'?'missed':'';
+      const tag=rc==='done'?'<span class="ok">✓ ပြီး</span>':rc==='cur'?'<span>ယနေ့ · Today</span>':rc==='missed'?'<span>Missed</span>':`<span>${my(c.rounds*S.bpr)} စေ့</span>`;
+      rows+=`<li class="dayrow ${rc}"><div class="dd"><b>${fmt(sch[i].key,{day:'numeric',month:'short'})}</b>${DAYS[c.wd]}<br>Day ${c.i+1}</div><div class="dm"><div class="say">${g.my}</div><div class="pl">${g.pali}</div></div><div class="dc"><b>${my(c.rounds)} ပတ်</b>${tag}</div></li>`;
+    }
+    l+=`<details class="lvlbox" data-l="${L}" ${openLevels.has(L)?'open':''}><summary class="lrow"><span class="nm">${LEVELS[L]} အဆင့်</span><span class="rg">${fmt(a)} – ${fmt(b)}</span>${badge}<span class="chev" aria-hidden="true">›</span><div class="bar"><span style="width:${n/9*100}%"></span></div></summary><ul class="days">${rows}</ul></details>`;
+  }
+  $('lvlsum').innerHTML=l;
+}
+
+let jumpArmed=false, detailHost='detail';
+const openLevels=new Set([Math.floor(S.cur/9)]);
+function renderDetail(){
+  const other=detailHost==='detail'?'calDetail':'detail';
+  $(other).hidden=true;
+  const d=$(detailHost);
+  if(selected===null){d.hidden=true;return;}
+  const c=cellInfo(selected), g=GUNA[c.g];
+  const sk=schedule()[selected];
+  const df={weekday:'short',day:'numeric',month:'short'};
+  const st={done:'Completed on '+fmt(sk.key,df),'cur-done':'Completed on '+fmt(sk.key,df),cur:'Today — in progress',missed:'Missed on '+fmt(sk.key,df),planned:'Planned for '+fmt(sk.key,df)}[sk.status];
+  // Jumping is only allowed to a chart day that falls on today's weekday, so Day 1 always lines up with a Monday.
+  const canJump=selected!==S.cur && c.wd===new Date().getDay();
+  d.hidden=false;
+  d.innerHTML=`<p><strong>${LEVELS[c.L]} အဆင့် · Day ${c.i+1}</strong> — ${DAYS[c.wd]} (${DAYS_EN[c.wd]})</p>
+   <p style="font-size:1.3rem;color:var(--maroon);font-weight:700">${g.my}</p>
+   <p class="pali">${g.pali} · ${my(c.rounds)} ပတ်</p>
+   <p class="warn">${st}</p>
+   <div class="actions" style="justify-content:flex-start">${canJump?`<button class="btn primary" id="jump">${jumpArmed?'Tap again to confirm':'I am on this day today'}</button>`:''}<button class="btn" id="closeD">Close</button></div>
+   ${canJump?'<p class="warn">Use this if you already started on paper. Earlier days are marked done and the calendar shifts to match.</p>':''}`;
+  const j=$('jump'); if(j) j.onclick=()=>{
+    if(!jumpArmed){jumpArmed=true;renderDetail();return;}
+    jumpArmed=false;
+    const nd={}; for(let k=0;k<selected;k++) nd[k]='prior';
+    S.done=nd; S.cur=selected; S.beads=0; S.rounds=0;
+    S.startDate=todayKey(addDays(keyToDate(todayKey()),-selected));
+    selected=null; calMonth=null; save(); render();
+  };
+  $('closeD').onclick=()=>{selected=null;jumpArmed=false;renderGrid();};
+}
+
+$('grid').addEventListener('click',e=>{
+  const b=e.target.closest('.cell'); if(!b) return;
+  const i=+b.dataset.i; detailHost='detail'; selected=(selected===i?null:i); jumpArmed=false; renderGrid();
+});
+$('cal').addEventListener('click',e=>{
+  const b=e.target.closest('button.dcell'); if(!b) return;
+  const i=+b.dataset.i; detailHost='calDetail'; selected=(selected===i?null:i); jumpArmed=false; renderGrid();
+});
+$('lvlsum').addEventListener('toggle',e=>{const d=e.target; if(!d.dataset||d.dataset.l===undefined) return; const L=+d.dataset.l; d.open?openLevels.add(L):openLevels.delete(L);},true);
+$('calPrev').addEventListener('click',()=>{calMonth=new Date(calMonth.getFullYear(),calMonth.getMonth()-1,1);renderCal();});
+$('calNext').addEventListener('click',()=>{calMonth=new Date(calMonth.getFullYear(),calMonth.getMonth()+1,1);renderCal();});
+$('ring').addEventListener('click',count);
+$('undo').addEventListener('click',undo);
+$('resetDay').addEventListener('click',resetDay);
+$('startOver').addEventListener('click',startOver);
+$('histBtn').addEventListener('click',()=>showHistory(!document.body.classList.contains('show-history')));
+$('people').addEventListener('click',e=>{
+  const b=e.target.closest('.person'); if(!b) return;
+  if(b.dataset.add){ const box=$('personPanel'); if(!box.hidden&&$('pName')){box.hidden=true;return;} showPanel('add'); return; }
+  if(b.dataset.id===P.active){ const box=$('personPanel'); if(!box.hidden&&$('pRename')){box.hidden=true;return;} showPanel('edit'); return; }
+  switchTo(b.dataset.id);
+});
+const sel=$('bpr'), PRESETS=['108','54','27','21'];
+function syncBpr(){
+  const v=String(S.bpr), preset=PRESETS.includes(v);
+  sel.value=preset?v:'custom';
+  $('bprCustomWrap').hidden=preset;
+  $('bprCustom').value=v;
+}
+function setBpr(n){
+  n=Math.round(+n);
+  if(!(n>=1&&n<=1000)){ $('bprMsg').textContent='Please enter a whole number from 1 to 1000.'; $('bprCustom').focus(); return; }
+  S.bpr=n; if(S.beads>=S.bpr) S.beads=0;
+  $('bprMsg').textContent=`One round is now ${n} beads (${my(n)} စေ့).`;
+  save(); syncBpr(); render();
+}
+sel.addEventListener('change',()=>{
+  if(sel.value==='custom'){ $('bprCustomWrap').hidden=false; $('bprCustom').value=PRESETS.includes(String(S.bpr))?'':S.bpr; $('bprCustom').focus(); return; }
+  setBpr(sel.value);
+});
+$('bprSet').addEventListener('click',()=>setBpr($('bprCustom').value));
+$('bprCustom').addEventListener('keydown',e=>{ if(e.key==='Enter') setBpr($('bprCustom').value); });
+syncBpr();
+
+document.addEventListener('visibilitychange',()=>{if(!document.hidden){rollover();render();}});
+setInterval(()=>{rollover();render();},30000);
+
+// keep the screen awake while counting, if allowed
+async function wake(){try{if('wakeLock' in navigator) await navigator.wakeLock.request('screen');}catch(e){}}
+document.addEventListener('click',wake,{once:true});
+
+rollover(); render();
+})();
+</script>
+
+<script>
+if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').catch(()=>{});});}
+</script>
+</body>
+</html>
