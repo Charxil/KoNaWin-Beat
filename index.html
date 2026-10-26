@@ -89,6 +89,8 @@ section h2{font-family:var(--f-display);font-weight:400;font-size:1.2rem;margin:
 .cell.done{background:var(--done);border-color:var(--done);color:var(--surface)}
 .cell.done small{color:var(--surface);opacity:.85}
 .cell.cur{border:2px solid var(--saffron);background:var(--cur-soft)}
+.cell.cur.done{background:var(--done);border-color:var(--saffron);color:var(--surface)}
+.cell.cur.done small{color:var(--surface)}
 .cell.sel{outline:2px solid var(--maroon);outline-offset:1px}
 .cell:focus-visible{outline:2px solid var(--saffron)}
 .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:.8rem;color:var(--muted);margin-top:10px}
@@ -111,6 +113,8 @@ section h2{font-family:var(--f-display);font-weight:400;font-size:1.2rem;margin:
 .dcell.done{background:var(--done);border-color:var(--done);color:var(--surface)}
 .dcell.done .tag{color:var(--surface);opacity:.85}
 .dcell.cur{border:2px solid var(--saffron);background:var(--cur-soft)}
+.dcell.cur.done{background:var(--done);border-color:var(--saffron);color:var(--surface)}
+.dcell.cur.done .tag{color:var(--surface)}
 .dcell.missed{background:var(--missed-soft);border-color:var(--missed);color:var(--missed)}
 .dcell.missed .tag{color:var(--missed)}
 .dcell.past{opacity:.55}
@@ -304,6 +308,7 @@ const GUNA=[null,
 // Level 1 sequence from the chart; each following level shifts every attribute by one.
 const ROW1=[2,9,4,7,5,3,6,1,8];
 const DAYS=['တနင်္ဂနွေ','တနင်္လာ','အင်္ဂါ','ဗုဒ္ဓဟူး','ကြာသပတေး','သောကြာ','စနေ'];
+const DAYS_SHORT=['နွေ','လာ','ဂါ','ဟူး','တေး','ကြာ','နေ'];
 const DAYS_EN=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 const LEVELS=['ပထမ','ဒုတိယ','တတိယ','စတုတ္ထ','ပဉ္စမ','ဆဋ္ဌမ','သတ္တမ','အဋ္ဌမ','နဝမ'];
 const MYD='၀၁၂၃၄၅၆၇၈၉';
@@ -541,6 +546,8 @@ function count(){
     try{navigator.vibrate&&navigator.vibrate([30,40,30]);}catch(e){}
     flash();
     if(S.rounds>=info.rounds){S.rounds=info.rounds; S.done[S.cur]=todayKey();
+      // all rounds for the day finished: one long vibration
+      try{navigator.vibrate&&navigator.vibrate(1200);}catch(e){}
       if(S.cur===TOTAL-1 && !S.awards.some(a=>a.start===S.startDate)){
         S.awards.push({start:S.startDate,end:todayKey()}); setTimeout(()=>showHistory(true),900);
       }
@@ -646,7 +653,7 @@ function renderGrid(){
       if(idx===S.cur&&!S.done[idx]) cls.push('cur');
       if(idx===S.cur&&S.done[idx]) cls.push('cur','done');
       if(idx===selected) cls.push('sel');
-      h+=`<button class="${cls.join(' ')}" data-i="${idx}" aria-label="Level ${L+1} day ${i+1}, ${DAYS_EN[c.wd]}, ${GUNA[c.g].pali}, ${c.rounds} rounds"><span>${my(c.rounds)}</span><small>${DAYS[c.wd].slice(0,2)}</small></button>`;
+      h+=`<button class="${cls.join(' ')}" data-i="${idx}" aria-label="Level ${L+1} day ${i+1}, ${DAYS_EN[c.wd]}, ${GUNA[c.g].pali}, ${c.rounds} rounds"><span>${my(c.rounds)}</span><small>${DAYS_SHORT[c.wd]}</small></button>`;
     }
   }
   grid.innerHTML=h;
@@ -677,7 +684,7 @@ function renderCal(){
   if(!calMonth){const d=keyToDate(sch[S.cur].key);calMonth=new Date(d.getFullYear(),d.getMonth(),1);}
   $('calTitle').textContent=calMonth.toLocaleDateString(undefined,{month:'long',year:'numeric'});
   let h='';
-  DAYS.forEach((d,i)=>{h+=`<div class="dow">${DAYS_EN[i].slice(0,3)}<br>${d.slice(0,3)}</div>`;});
+  DAYS.forEach((d,i)=>{h+=`<div class="dow">${DAYS_EN[i].slice(0,3)}<br>${DAYS_SHORT[i]}</div>`;});
   const first=calMonth.getDay(), dim=new Date(calMonth.getFullYear(),calMonth.getMonth()+1,0).getDate();
   for(let k=0;k<first;k++) h+='<div class="dcell empty"></div>';
   const tk=todayKey();
